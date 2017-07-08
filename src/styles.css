@@ -1,6 +1,10 @@
-body, * {
+* {
 	font-family: 'Raleway', sans-serif;
 	font-size: 20px;
+}
+
+body {
+	margin: 0;
 }
 
 img {
@@ -15,14 +19,9 @@ ul {
 }
 
 .container {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	position: relative;
 	display: flex;
+	align-items: stretch;
 }
 
 .sidebar {
@@ -30,8 +29,7 @@ ul {
     flex-direction: column;
 	position: relative;
 	background: #7DC5FF;
-	width: 400px;
-	height: 100%;
+	width: 256px;
 	max-height: 768px;
 }
 
@@ -80,7 +78,8 @@ ul {
 .score {
 	position: absolute;
 	width: 100%;
-	text-align: center;
+	text-align: left;
+	top: 0;
 }
 
 .generator-list {
@@ -101,6 +100,12 @@ ul {
     justify-content: space-between;
     align-items: center;
     background: #CCC;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .generator > button.disable {
@@ -114,4 +119,9 @@ ul {
 	background-size: 100%;
 	width: 1em;
 	height: 1em;
+}
+
+.milestone {
+	width: 200px;
+	height: 100%;
 }

@@ -4,20 +4,38 @@ window.onload = function() {
     var sprites = [];
     var score = 0;
     var rowIDs = [];
-    var generators = [
-        { bps: 1, count: 0, cost: 16, growthRate: 1.07, multiplier: 1 },
-    ]
     var scale = 1;
     var rowHeight = 70 * scale;
+    var generators = [
+        { selector: '#bt-generator1', bps: 1, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator2', bps: 5, count: 0, cost: 100, growthRate: 1.08, multiplier: 1 },
+        { selector: '#bt-generator3', bps: 20, count: 0, cost: 2000, growthRate: 1.09, multiplier: 1 },
+        { selector: '#bt-generator4', bps: 80, count: 0, cost: 10000, growthRate: 1.1, multiplier: 1 },
+        { selector: '#bt-generator5', bps: 150, count: 0, cost: 20000, growthRate: 1.2, multiplier: 1 },
+    ]
     var milestones = [
-        { height: 2.66, name: '' },
+        { height: 1, name: 'Milestone #1' },
+        { height: 2, name: 'Milestone #2' },
+        { height: 4, name: 'Milestone #3' },
+        { height: 8, name: 'Milestone #4' },
+        { height: 16, name: 'Milestone #5' },
+        { height: 32, name: 'Milestone #6' },
+        { height: 64, name: 'Milestone #7' },
+        { height: 128, name: 'Milestone #8' },
+        { height: 256, name: 'Milestone #9' },
+        { height: 512, name: 'Milestone #10' },
+        { height: 1024, name: 'Milestone #11' },
+        { height: 2048, name: 'Milestone #12' },
     ];
+    var currentMilestoneId = -1;
 
     $('#bt-cinderblock').on('click', (event) => {
-        addBricks(1);
-        score += 1;
+        addBricks(10);
+        score += 10;
     });
-    $('#bt-generator1 > button').on('click', (event) => buyGenerator(0, 1));
+    generators.forEach((generator, index) => {
+        $(generator.selector).find('button').on('click', (event) => buyGenerator(index, 1));
+    });
 
     updateGenerators();
 
@@ -61,6 +79,7 @@ window.onload = function() {
 
     function create() {
 
+        game.stage.disableVisibilityChange = true;
         game.input.mouse.capture = true;
         game.stage.backgroundColor = '#7DC5FF';
         cameraHeight = game.add.sprite(game.world.centerX, game.world.centerY);
@@ -85,7 +104,9 @@ window.onload = function() {
         updateBricks(score, score + increment);
         score += increment;
         updateGenerators();
-        $('#bps').text('BPS : ' + increment / (game.time.elapsed / 1000));
+        updateMilestones();
+        bps = Math.round(increment / (game.time.elapsed / 1000))
+        $('#bps').text('BPS : ' + bps);
 
     }
 
@@ -171,16 +192,29 @@ window.onload = function() {
     }
 
     function updateGenerators() {
-        generators.forEach((generator) => {
+        generators.forEach((generator, index) => {
             nextCost = Math.floor(generator.cost * Math.pow(generator.growthRate, generator.count));
-            $('#bt-generator1 .generator-count').text(generator.count);
-            $('#bt-generator1 .generator-cost').text(nextCost);
+            $(generator.selector).find('.generator-count').text(generator.count);
+            $(generator.selector).find('.generator-cost').text(nextCost);
             if (score >= nextCost) {
-                $('#bt-generator1 > button').removeClass('disable');
+                $(generator.selector).find('button').removeClass('disable');
             }
             else {
-                $('#bt-generator1 > button').addClass('disable');
+                $(generator.selector).find('button').addClass('disable');
             }
         });
+    }
+
+    function updateMilestones() {
+        var flooredScore = Math.floor(score);
+        var lastMilestone = currentMilestoneId;
+        milestones.forEach((milestone, index) => {
+            if (Math.floor(flooredScore / 16) * 0.2 >= milestone.height && index > currentMilestoneId) {
+                currentMilestoneId = index;
+            }
+        });
+        if (currentMilestoneId > lastMilestone) {
+            $('#milestone-list').append('<li>' + milestones[currentMilestoneId].name + ' (' + milestones[currentMilestoneId].height + 'm)' + '</li>');
+        }
     }
 };
