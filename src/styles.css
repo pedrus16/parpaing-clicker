@@ -1,6 +1,17 @@
+body, * {
+	font-family: 'Raleway', sans-serif;
+	font-size: 20px;
+}
+
 img {
 	max-width: 100%;
 	height: auto;
+}
+
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
 .container {
@@ -15,10 +26,51 @@ img {
 }
 
 .sidebar {
+    display: flex;
+    flex-direction: column;
 	position: relative;
-	background: #F0F;
+	background: #7DC5FF;
 	width: 400px;
 	height: 100%;
+	max-height: 768px;
+}
+
+.cinder-block {
+	padding: 32px;
+	cursor: pointer;
+}
+
+.wobble {
+	transition: transform 0.2s ease-out;
+	animation: wobble 2.5s alternate infinite ease-in-out;
+}
+
+.sine {
+	transition: transform 0.2s ease-out;
+	animation: upDown 2s alternate infinite ease-in-out;
+}
+
+@keyframes upDown {
+	from { transform: translateY(-8px); }
+	to { transform: translateY(8px); }
+}
+
+@keyframes wobble {
+	from { transform: rotate(-2deg); }
+	to { transform: rotate(2deg); }
+}
+
+.cinder-block img {
+	transition: transform 0.2s ease-out;
+}
+
+.cinder-block img:hover {
+	transform: scale(1.05);
+}
+
+.cinder-block img:active {
+	transition-duration: 0s;
+	transform: scale(1);
 }
 
 .viewport-container {
@@ -29,4 +81,37 @@ img {
 	position: absolute;
 	width: 100%;
 	text-align: center;
+}
+
+.generator-list {
+    max-height: 100%;
+    overflow: auto;
+}
+
+.generator > button {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    margin: 0;
+	padding: 16px;
+	display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: #CCC;
+}
+
+.generator > button.disable {
+	opacity: 0.4;
+	pointer-events: none;
+}
+
+.inline-cinder-block {
+	display: inline-block;
+	background-image: url('../assets/parpaing_big.png');
+	background-size: 100%;
+	width: 1em;
+	height: 1em;
 }

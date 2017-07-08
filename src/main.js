@@ -1,6 +1,6 @@
 window.onload = function() {
 
-    var game = new Phaser.Game(512, 768, Phaser.AUTO, 'viewport', { preload: preload, create: create, update: update, render: render });
+    var game = new Phaser.Game(600, 768, Phaser.AUTO, 'viewport', { preload: preload, create: create, update: update, render: render });
     var sprites = [];
     var score = 0;
     var rowIDs = [];
@@ -9,12 +9,15 @@ window.onload = function() {
     ]
     var scale = 1;
     var rowHeight = 70 * scale;
+    var milestones = [
+        { height: 2.66, name: '' },
+    ];
 
     $('#bt-cinderblock').on('click', (event) => {
         addBricks(1);
         score += 1;
     });
-    $('#bt-generator1').on('click', (event) => buyGenerator(0, 1));
+    $('#bt-generator1 > button').on('click', (event) => buyGenerator(0, 1));
 
     updateGenerators();
 
@@ -60,13 +63,6 @@ window.onload = function() {
 
         game.input.mouse.capture = true;
         game.stage.backgroundColor = '#7DC5FF';
-        // game.world.setBounds(0, 0, 1024, 768);
-        // scoreText = game.add.text(16, 16, 'Parpaings : 0', { fontSize: '16px', fill: '#fff' });
-        // scoreText.fixedToCamera = true;
-        // heightText = game.add.text(16, 32, 'Hauteur : 0m', { fontSize: '16px', fill: '#fff' });
-        // heightText.fixedToCamera = true;
-        // bpsText = game.add.text(16, 48, 'BPS : 0', { fontSize: '16px', fill: '#fff' });
-        // bpsText.fixedToCamera = true;
         cameraHeight = game.add.sprite(game.world.centerX, game.world.centerY);
         cameraHeight.anchor.setTo(0.5);
         game.camera.x = game.world.centerX - 512;
@@ -88,7 +84,7 @@ window.onload = function() {
         });
         updateBricks(score, score + increment);
         score += increment;
-
+        updateGenerators();
         $('#bps').text('BPS : ' + increment / (game.time.elapsed / 1000));
 
     }
@@ -134,9 +130,9 @@ window.onload = function() {
         //     }
         // }
         var spriteIndex = _score % 32 + 1; // rowIDs.splice(Math.floor(Math.random() * rowIDs.length), 1)[0];
-        var brick = game.add.sprite(256, posY, 'parpin' + spriteIndex);
+        var brick = game.add.sprite(300, posY, 'parpin' + spriteIndex);
         // brick.scale.setTo(scale);
-        brick.anchor.setTo(0.5);
+        brick.anchor.setTo(0.5, 0.5);
         sprites.push(brick);
         bricks.add(brick);
 
@@ -179,6 +175,12 @@ window.onload = function() {
             nextCost = Math.floor(generator.cost * Math.pow(generator.growthRate, generator.count));
             $('#bt-generator1 .generator-count').text(generator.count);
             $('#bt-generator1 .generator-cost').text(nextCost);
+            if (score >= nextCost) {
+                $('#bt-generator1 > button').removeClass('disable');
+            }
+            else {
+                $('#bt-generator1 > button').addClass('disable');
+            }
         });
     }
 };
