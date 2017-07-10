@@ -14,22 +14,15 @@ window.onload = function() {
         { selector: '#bt-generator5', bps: 150, count: 0, cost: 20000, growthRate: 1.07, multiplier: 1 },
     ]
     var milestones = [
-        { height: 1, name: 'Milestone #1' },
-        { height: 2, name: 'Milestone #2' },
-        { height: 4, name: 'Milestone #3' },
-        { height: 8, name: 'Milestone #4' },
-        { height: 16, name: 'Milestone #5' },
-        { height: 32, name: 'Milestone #6' },
-        { height: 64, name: 'Milestone #7' },
-        { height: 128, name: 'Milestone #8' },
-        { height: 256, name: 'Milestone #9' },
-        { height: 512, name: 'Milestone #10' },
-        { height: 1024, name: 'Milestone #11' },
-        { height: 2048, name: 'Milestone #12' },
-        { height: 4096, name: 'Milestone #13' },
-        { height: 8192, name: 'Milestone #14' },
-        { height: 16384, name: 'Milestone #15' },
-        { height: 32768, name: 'Milestone #16' },
+        { height: 2.6, name: 'Little house' },
+        { height: 4.8, name: 'Giraffe' },
+        { height: 150, name: 'Godzilla' },
+        { height: 324, name: 'Eiffel Tower hon hon hon' },
+        { height: 828, name: 'Burj Khalifa' },
+        { height: 8848, name: 'Everest' },
+        { height: 15000, name: 'Above the clouds' },
+        { height: 690000, name: 'Spaaaaaace' },
+        { height: 384400000, name: 'Moon' },
     ];
     var heightColors = [
         { height: 0, color: '#7DC5FF' },
@@ -99,8 +92,8 @@ window.onload = function() {
         game.camera.follow(cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.2);
         game.camera.bounds = null;
 
-        var ground = game.add.sprite(200, game.world.height - 320, 'ground');
-        // ground.scale.set(0.5);
+        var ground = game.add.sprite(200, game.world.height - 350, 'ground');
+        ground.scale.set(0.5);
         ground.anchor.set(0.5, 0.5);
 
         bricks = game.add.group();
