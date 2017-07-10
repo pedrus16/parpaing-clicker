@@ -116,7 +116,7 @@ window.onload = function() {
 
         bps = Math.round(increment / (game.time.elapsed / 1000))
 
-        $('#bps').text('BPS : ' + bps);
+        $('#bps').text(bps);
         var flooredScore = Math.floor(score);
         cameraHeight.y = game.world.centerY - rowHeight * 0.5 * Math.floor(flooredScore / 16);
 
@@ -176,6 +176,11 @@ window.onload = function() {
             if (sprites.length > 400) {
                 var spriteToDestroy = sprites.shift();
                 spriteToDestroy.destroy();
+                // var fadeOut = game.add.tween(spriteToDestroy);
+                // fadeOut.from({ alpha: 0 }, 400, Phaser.Easing.Cubic.In);
+                // fadeOut.onCompleteCallback(() => spriteToDestroy.destroy());
+                // fadeOut.start();
+                
             }
         }
     }
@@ -196,13 +201,9 @@ window.onload = function() {
         sprites.push(brick);
         bricks.add(brick);
 
-        var bounce = game.add.tween(brick);
-        bounce.from({ y: brick.y - 100 * _scale }, (500 + Math.random() * 400) * _scale, Phaser.Easing.Bounce.Out)
-        bounce.start();
-
-        var fadeIn = game.add.tween(brick);
-        fadeIn.from({ alpha: 0 }, 400 * _scale, Phaser.Easing.Cubic.Out);
-        fadeIn.start();
+        var duration = (150 + Math.random() * 150) * _scale;
+        game.add.tween(brick).from({ y: '-70' }, duration, Phaser.Easing.Bounce.Out).start();
+        game.add.tween(brick).from({ alpha: 0 }, 300 * _scale, Phaser.Easing.Cubic.Out).start();
 
         return brick;
     }
@@ -216,7 +217,10 @@ window.onload = function() {
         for (var i = 0; i < cost; i++) {
             var spriteToDestroy = sprites.pop();
             if (spriteToDestroy) { 
-                spriteToDestroy.destroy(); 
+                var fadeOut = game.add.tween(spriteToDestroy);
+                fadeOut.to({ alpha: 0 }, (100 + Math.random() * 200), Phaser.Easing.Cubic.In);
+                fadeOut.onComplete.add((target) => target.destroy());
+                fadeOut.start();
             }
         }
         // removeBricks(cost);
@@ -226,7 +230,7 @@ window.onload = function() {
 
     function updateScoreUI() {
         var flooredScore = Math.floor(score);
-        $('#score').text('Cinder blocks: ' + new Intl.NumberFormat().format(Math.max(0, flooredScore)));
+        $('#score').text(new Intl.NumberFormat().format(Math.max(0, flooredScore)));
         $('#height').text('Height: ' + new Intl.NumberFormat().format(Math.floor(flooredScore / 16) * 0.2) + 'm');
     }
 
