@@ -1,17 +1,17 @@
 window.onload = function() {
 
-    var game = new Phaser.Game(600, 768, Phaser.AUTO, 'viewport', { preload: preload, create: create, update: update, render: render });
+    var game = new Phaser.Game(400, 768, Phaser.AUTO, 'viewport', { preload: preload, create: create, update: update, render: render });
     var sprites = [];
     var score = 0;
     var rowIDs = [];
-    var scale = 1;
+    var scale = 0.5;
     var rowHeight = 70 * scale;
     var generators = [
         { selector: '#bt-generator1', bps: 1, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
-        { selector: '#bt-generator2', bps: 5, count: 0, cost: 100, growthRate: 1.08, multiplier: 1 },
-        { selector: '#bt-generator3', bps: 20, count: 0, cost: 2000, growthRate: 1.09, multiplier: 1 },
-        { selector: '#bt-generator4', bps: 80, count: 0, cost: 10000, growthRate: 1.1, multiplier: 1 },
-        { selector: '#bt-generator5', bps: 150, count: 0, cost: 20000, growthRate: 1.2, multiplier: 1 },
+        { selector: '#bt-generator2', bps: 5, count: 0, cost: 80, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator3', bps: 20, count: 0, cost: 2000, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator4', bps: 80, count: 0, cost: 10000, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator5', bps: 150, count: 0, cost: 20000, growthRate: 1.07, multiplier: 1 },
     ]
     var milestones = [
         { height: 1, name: 'Milestone #1' },
@@ -26,12 +26,21 @@ window.onload = function() {
         { height: 512, name: 'Milestone #10' },
         { height: 1024, name: 'Milestone #11' },
         { height: 2048, name: 'Milestone #12' },
+        { height: 4096, name: 'Milestone #13' },
+        { height: 8192, name: 'Milestone #14' },
+        { height: 16384, name: 'Milestone #15' },
+        { height: 32768, name: 'Milestone #16' },
     ];
+    var heightColors = [
+        { height: 0, color: '#7DC5FF' },
+        { height: 12000, color: '#7DC5FF' },
+        { height: 80000, color: '#001122' },
+    ]
     var currentMilestoneId = -1;
 
     $('#bt-cinderblock').on('click', (event) => {
-        addBricks(10);
-        score += 10;
+        addBricks(1);
+        score += 1;
     });
     generators.forEach((generator, index) => {
         $(generator.selector).find('button').on('click', (event) => buyGenerator(index, 1));
@@ -74,6 +83,7 @@ window.onload = function() {
         game.load.image('parpin31', 'assets/0031.png');
         game.load.image('parpin32', 'assets/0032.png');
         game.load.image('parpaingButton', 'assets/parpaing_button.png');
+        game.load.image('ground', 'assets/ground.png');
 
     }
 
@@ -89,6 +99,10 @@ window.onload = function() {
         game.camera.follow(cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.2);
         game.camera.bounds = null;
 
+        var ground = game.add.sprite(200, game.world.height - 320, 'ground');
+        // ground.scale.set(0.5);
+        ground.anchor.set(0.5, 0.5);
+
         bricks = game.add.group();
         bps = 0;
         lastScore = 0;
@@ -103,11 +117,44 @@ window.onload = function() {
         });
         updateBricks(score, score + increment);
         score += increment;
+        updateScoreUI();
         updateGenerators();
         updateMilestones();
-        bps = Math.round(increment / (game.time.elapsed / 1000))
-        $('#bps').text('BPS : ' + bps);
 
+        bps = Math.round(increment / (game.time.elapsed / 1000))
+
+        $('#bps').text('BPS : ' + bps);
+        var flooredScore = Math.floor(score);
+        cameraHeight.y = game.world.centerY - rowHeight * 0.5 * Math.floor(flooredScore / 16);
+
+        // game.camera.y
+        // game.stage.backgroundColor = '#7DC5FF';
+        var height = Math.floor(flooredScore / 16) * 0.2;
+        var lowerColor;
+        var upperColor;
+        heightColors.forEach((color) => {
+            if (color.height <= height) {
+                lowerColor = color;
+            }
+            else if (!upperColor && color.height >= height) {
+                upperColor = color;   
+            }
+        });
+        if (!upperColor) { upperColor = lowerColor; }
+        var ratio = (height - lowerColor.height) / (upperColor.height - lowerColor.height);
+        game.stage.backgroundColor = lerpColor(lowerColor.color, upperColor.color, ratio);
+    }
+
+    function lerpColor(a, b, amount) { 
+        var ah = parseInt(a.replace(/#/g, ''), 16),
+            ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+            bh = parseInt(b.replace(/#/g, ''), 16),
+            br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+            rr = ar + amount * (br - ar),
+            rg = ag + amount * (bg - ag),
+            rb = ab + amount * (bb - ab);
+
+        return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
     }
 
     function render() {
@@ -124,11 +171,10 @@ window.onload = function() {
         if (delta > 0) {
             addBricks(delta);
         }
-        cameraHeight.y = game.world.centerY - rowHeight * 0.5 * Math.floor(flooredScore / 16);
-        updateScore();
     }
 
     function addBricks(step = 1) {
+        if (step > 400) { return; };
         var flooredScore = Math.floor(score);
         for (var i = 0; i < step; i++) {
             var tempScore = flooredScore + i;
@@ -151,8 +197,8 @@ window.onload = function() {
         //     }
         // }
         var spriteIndex = _score % 32 + 1; // rowIDs.splice(Math.floor(Math.random() * rowIDs.length), 1)[0];
-        var brick = game.add.sprite(300, posY, 'parpin' + spriteIndex);
-        // brick.scale.setTo(scale);
+        var brick = game.add.sprite(200, posY, 'parpin' + spriteIndex);
+        brick.scale.setTo(scale);
         brick.anchor.setTo(0.5, 0.5);
         sprites.push(brick);
         bricks.add(brick);
@@ -185,7 +231,7 @@ window.onload = function() {
         updateGenerators();
     }
 
-    function updateScore() {
+    function updateScoreUI() {
         var flooredScore = Math.floor(score);
         $('#score').text('Cinder blocks: ' + new Intl.NumberFormat().format(Math.max(0, flooredScore)));
         $('#height').text('Height: ' + new Intl.NumberFormat().format(Math.floor(flooredScore / 16) * 0.2) + 'm');
