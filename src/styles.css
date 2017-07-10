@@ -113,7 +113,6 @@ ul {
 	padding: 16px;
 	display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
     background: #CCC;
 	-webkit-touch-callout: none;
@@ -128,6 +127,16 @@ ul {
 	opacity: 0.4;
 	pointer-events: none;
 }
+
+.generator > button > .label {
+	flex: 1;
+}
+
+.generator > button > img {
+	margin-right: 10px;
+	width: 40px;
+}
+
 
 .inline-cinder-block {
 	display: inline-block;
