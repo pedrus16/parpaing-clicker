@@ -5,10 +5,10 @@ window.onload = function() {
     let score = 0;
     let rowIDs = [];
     let scale = 0.5;
-    let rowHeight = 70 * scale;
+    let rowHeight = 70;
     let generators = [
-        { selector: '#bt-generator1', bps: 100, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
-        { selector: '#bt-generator2', bps: 5, count: 0, cost: 80, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator1', bps: 1, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator2', bps: 5, count: 0, cost: 80, growthRate: 1.0, multiplier: 1 },
         { selector: '#bt-generator3', bps: 20, count: 0, cost: 200, growthRate: 1.07, multiplier: 1 },
         { selector: '#bt-generator4', bps: 80, count: 0, cost: 1000, growthRate: 1.07, multiplier: 1 },
         { selector: '#bt-generator5', bps: 150, count: 0, cost: 2000, growthRate: 1.07, multiplier: 1 },
@@ -103,14 +103,22 @@ window.onload = function() {
 
         updateGenerators();
 
-        for (let i = 0; i < 600; i++) {
-            let sprite = bricks.create(0, 0, 'parpin1', 0);
-            sprite.visible = false;
-            sprite.scale.setTo(scale);
-            sprite.anchor.setTo(0.5, 0.5);
-            brickPool.push(sprite);
-            // bricks.add(sprite);
-        }
+        bricks.createMultiple(400, 'parpin1', 0, 0);
+        bricks.scale.setTo(scale);
+        bricks.x = 200;
+        bricks.y = game.world.height - 384;
+        bricks.forEach((brick) => brick.anchor.setTo(0.5, 0.5));
+        // bricks.anchor.set(0.5, 0.5);
+        // for (let i = 0; i < 32; i++) {
+        //     // let sprite = bricks.create(0, 0, 'parpin1', 0);
+        //     sprite.z = -1;
+        //     // sprite.visible = false;
+        //     sprite.scale.setTo(scale);
+        //     sprite.anchor.setTo(0.5, 0.5);
+        //     brickPool.push(sprite);
+        //     // bricks.add(sprite);
+        // }
+        // bricks.sort('z', Phaser.Group.SORT_ASCENDING);
     }
 
     function update() {
@@ -129,7 +137,7 @@ window.onload = function() {
 
         $('#bps').text(bps);
         let flooredScore = Math.floor(score);
-        cameraHeight.y = game.world.centerY - rowHeight * 0.5 * Math.floor(flooredScore / 16);
+        cameraHeight.y = game.world.centerY - rowHeight * scale * 0.5 * Math.floor(flooredScore / 16);
 
         // game.camera.y
         // game.stage.backgroundColor = '#7DC5FF';
@@ -181,19 +189,17 @@ window.onload = function() {
         let flooredScore = Math.floor(score);
         for (let i = 0; i < step; i++) {
             let tempScore = flooredScore + i;
-            let posY = game.world.height - 384 - rowHeight * Math.floor(tempScore / 32);
-            poolIndex = (poolIndex + 1) % brickPool.length;
-            let brick = brickPool[poolIndex];
+            let posY = -rowHeight * Math.floor(tempScore / 32);
+            let brick = bricks.getBottom();
             if (brick) {
                 var spriteIndex = tempScore % 32 + 1;
                 brick.loadTexture('parpin' + spriteIndex);
-                brick.x = 200;
+                brick.x = 0;
                 brick.y = posY;
-                brick.z = tempScore;
                 brick.visible = true;
+                bricks.bringToTop(brick);
             }
         }
-        bricks.sort('z', Phaser.Group.SORT_ASCENDING);
     }
 
     function buyGenerator(index, count = 1) {
@@ -204,27 +210,22 @@ window.onload = function() {
         score -= cost;
         let flooredScore = Math.floor(score);
         for (let i = 0; i < cost; i++) {
-            let tempScore = flooredScore + cost - i - brickPool.length - 1;
-            let brick = brickPool[poolIndex];
-            poolIndex -= 1;
-            if (poolIndex < 0) {
-                poolIndex = brickPool.length - 1;
-            }
+            let tempScore = flooredScore + cost - i - bricks.children.length - 1;
+            let brick = bricks.getTop();
             if (brick) {
                 let posY = 0;
                 if (tempScore >= 0) {
-                    posY = game.world.height - 384 - rowHeight * Math.floor(tempScore / 32);
+                    posY = -rowHeight * Math.floor(tempScore / 32);
                     let spriteIndex = tempScore % 32 + 1;
                     brick.loadTexture('parpin' + spriteIndex);
                     brick.visible = true;
-                    brick.x = 200;
                     brick.y = posY;
-                    brick.z = tempScore;
                 }
                 else {
                     brick.visible = false;
                 }
             }
+            bricks.sendToBack(brick);
         }
         generator.count += count;
         updateGenerators();
