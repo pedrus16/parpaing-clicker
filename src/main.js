@@ -1,19 +1,19 @@
 window.onload = function() {
 
-    var game = new Phaser.Game(400, 768, Phaser.AUTO, 'viewport', { preload: preload, create: create, update: update, render: render });
-    var sprites = [];
-    var score = 0;
-    var rowIDs = [];
-    var scale = 0.5;
-    var rowHeight = 70 * scale;
-    var generators = [
-        { selector: '#bt-generator1', bps: 1, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
+    let game = new Phaser.Game(400, 768, Phaser.AUTO, 'viewport', { preload: preload, create: create, update: update, render: render });
+    let sprites = [];
+    let score = 0;
+    let rowIDs = [];
+    let scale = 0.5;
+    let rowHeight = 70 * scale;
+    let generators = [
+        { selector: '#bt-generator1', bps: 100, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
         { selector: '#bt-generator2', bps: 5, count: 0, cost: 80, growthRate: 1.07, multiplier: 1 },
-        { selector: '#bt-generator3', bps: 20, count: 0, cost: 2000, growthRate: 1.07, multiplier: 1 },
-        { selector: '#bt-generator4', bps: 80, count: 0, cost: 10000, growthRate: 1.07, multiplier: 1 },
-        { selector: '#bt-generator5', bps: 150, count: 0, cost: 20000, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator3', bps: 20, count: 0, cost: 200, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator4', bps: 80, count: 0, cost: 1000, growthRate: 1.07, multiplier: 1 },
+        { selector: '#bt-generator5', bps: 150, count: 0, cost: 2000, growthRate: 1.07, multiplier: 1 },
     ]
-    var milestones = [
+    let milestones = [
         { height: 2.6, name: 'Little house' },
         { height: 4.8, name: 'Giraffe' },
         { height: 150, name: 'Godzilla' },
@@ -24,22 +24,15 @@ window.onload = function() {
         { height: 690000, name: 'Spaaaaaace' },
         { height: 384400000, name: 'Moon' },
     ];
-    var heightColors = [
+    let heightColors = [
         { height: 0, color: '#7DC5FF' },
         { height: 12000, color: '#7DC5FF' },
         { height: 80000, color: '#001122' },
     ]
-    var currentMilestoneId = -1;
-
-    $('#bt-cinderblock').on('click', (event) => {
-        addBricks(1);
-        score += 1;
-    });
-    generators.forEach((generator, index) => {
-        $(generator.selector).find('button').on('click', (event) => buyGenerator(index, 1));
-    });
-
-    updateGenerators();
+    let currentMilestoneId = -1;
+    let brickPool = [];
+    let poolIndex = 0;
+    let bricks;
 
     function preload() {
 
@@ -89,10 +82,10 @@ window.onload = function() {
         cameraHeight.anchor.setTo(0.5);
         game.camera.x = game.world.centerX - 512;
         game.camera.y = game.world.height - 384;
-        game.camera.follow(cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.2);
+        game.camera.follow(cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.9);
         game.camera.bounds = null;
 
-        var ground = game.add.sprite(200, game.world.height - 350, 'ground');
+        let ground = game.add.sprite(200, game.world.height - 350, 'ground');
         ground.scale.set(0.5);
         ground.anchor.set(0.5, 0.5);
 
@@ -100,11 +93,29 @@ window.onload = function() {
         bps = 0;
         lastScore = 0;
         step = 0;
+        $('#bt-cinderblock').on('click', (event) => {
+            addBricks(1);
+            score += 1;
+        });
+        generators.forEach((generator, index) => {
+            $(generator.selector).find('button').on('click', (event) => buyGenerator(index, 1));
+        });
+
+        updateGenerators();
+
+        for (let i = 0; i < 600; i++) {
+            let sprite = bricks.create(0, 0, 'parpin1', 0);
+            sprite.visible = false;
+            sprite.scale.setTo(scale);
+            sprite.anchor.setTo(0.5, 0.5);
+            brickPool.push(sprite);
+            // bricks.add(sprite);
+        }
     }
 
     function update() {
 
-        var increment = 0;
+        let increment = 0;
         generators.forEach((generator) => {
             increment += generator.bps * generator.count * generator.multiplier * (game.time.elapsed / 1000);
         });
@@ -117,14 +128,14 @@ window.onload = function() {
         bps = Math.round(increment / (game.time.elapsed / 1000))
 
         $('#bps').text(bps);
-        var flooredScore = Math.floor(score);
+        let flooredScore = Math.floor(score);
         cameraHeight.y = game.world.centerY - rowHeight * 0.5 * Math.floor(flooredScore / 16);
 
         // game.camera.y
         // game.stage.backgroundColor = '#7DC5FF';
-        var height = Math.floor(flooredScore / 16) * 0.2;
-        var lowerColor;
-        var upperColor;
+        let height = Math.floor(flooredScore / 16) * 0.2;
+        let lowerColor;
+        let upperColor;
         heightColors.forEach((color) => {
             if (color.height <= height) {
                 lowerColor = color;
@@ -134,12 +145,12 @@ window.onload = function() {
             }
         });
         if (!upperColor) { upperColor = lowerColor; }
-        var ratio = (height - lowerColor.height) / (upperColor.height - lowerColor.height);
+        let ratio = (height - lowerColor.height) / (upperColor.height - lowerColor.height);
         game.stage.backgroundColor = lerpColor(lowerColor.color, upperColor.color, ratio);
     }
 
     function lerpColor(a, b, amount) { 
-        var ah = parseInt(a.replace(/#/g, ''), 16),
+        let ah = parseInt(a.replace(/#/g, ''), 16),
             ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
             bh = parseInt(b.replace(/#/g, ''), 16),
             br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
@@ -159,77 +170,68 @@ window.onload = function() {
     }
 
     function updateBricks(prevScore, newScore) {
-        var flooredScore = Math.floor(newScore);
-        var delta = flooredScore - Math.floor(prevScore);
+        let flooredScore = Math.floor(newScore);
+        let delta = flooredScore - Math.floor(prevScore);
         if (delta > 0) {
             addBricks(delta);
-        }
+        } 
     }
 
     function addBricks(step = 1) {
-        if (step > 400) { return; };
-        var flooredScore = Math.floor(score);
-        for (var i = 0; i < step; i++) {
-            var tempScore = flooredScore + i;
-            var posY = game.world.height - 384 - rowHeight * Math.floor(tempScore / 32);
-            spawnBrick(tempScore, posY, 1 / step);
-            if (sprites.length > 400) {
-                var spriteToDestroy = sprites.shift();
-                spriteToDestroy.destroy();
-                // var fadeOut = game.add.tween(spriteToDestroy);
-                // fadeOut.from({ alpha: 0 }, 400, Phaser.Easing.Cubic.In);
-                // fadeOut.onCompleteCallback(() => spriteToDestroy.destroy());
-                // fadeOut.start();
-                
+        let flooredScore = Math.floor(score);
+        for (let i = 0; i < step; i++) {
+            let tempScore = flooredScore + i;
+            let posY = game.world.height - 384 - rowHeight * Math.floor(tempScore / 32);
+            poolIndex = (poolIndex + 1) % brickPool.length;
+            let brick = brickPool[poolIndex];
+            if (brick) {
+                var spriteIndex = tempScore % 32 + 1;
+                brick.loadTexture('parpin' + spriteIndex);
+                brick.x = 200;
+                brick.y = posY;
+                brick.z = tempScore;
+                brick.visible = true;
             }
         }
-    }
-
-    function spawnBrick(_score, posY, _scale) {
-        // if (!rowIDs.length) {
-        //     if (score % 32 < 16) {
-        //         rowIDs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-        //     }
-        //     else {
-        //         rowIDs = [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32];
-        //     }
-        // }
-        var spriteIndex = _score % 32 + 1; // rowIDs.splice(Math.floor(Math.random() * rowIDs.length), 1)[0];
-        var brick = game.add.sprite(200, posY, 'parpin' + spriteIndex);
-        brick.scale.setTo(scale);
-        brick.anchor.setTo(0.5, 0.5);
-        sprites.push(brick);
-        bricks.add(brick);
-
-        var duration = (150 + Math.random() * 150) * _scale;
-        game.add.tween(brick).from({ y: '-70' }, duration, Phaser.Easing.Bounce.Out).start();
-        game.add.tween(brick).from({ alpha: 0 }, 300 * _scale, Phaser.Easing.Cubic.Out).start();
-
-        return brick;
+        bricks.sort('z', Phaser.Group.SORT_ASCENDING);
     }
 
     function buyGenerator(index, count = 1) {
         if (!generators[index]) { return; }
-        generator = generators[index];
-        cost = Math.floor(generator.cost * Math.pow(generator.growthRate, generator.count));
+        let generator = generators[index];
+        let cost = Math.floor(generator.cost * Math.pow(generator.growthRate, generator.count));
         if (cost > score) { return; }
         score -= cost;
-        for (var i = 0; i < cost; i++) {
-            var spriteToDestroy = sprites.pop();
-            if (spriteToDestroy) { 
-                var fadeOut = game.add.tween(spriteToDestroy);
-                fadeOut.to({ alpha: 0 }, (100 + Math.random() * 200), Phaser.Easing.Cubic.In);
-                fadeOut.onComplete.add((target) => target.destroy());
-                fadeOut.start();
+        let flooredScore = Math.floor(score);
+        for (let i = 0; i < cost; i++) {
+            let tempScore = flooredScore + cost - i - brickPool.length - 1;
+            let brick = brickPool[poolIndex];
+            poolIndex -= 1;
+            if (poolIndex < 0) {
+                poolIndex = brickPool.length - 1;
+            }
+            if (brick) {
+                let posY = 0;
+                if (tempScore >= 0) {
+                    posY = game.world.height - 384 - rowHeight * Math.floor(tempScore / 32);
+                    let spriteIndex = tempScore % 32 + 1;
+                    brick.loadTexture('parpin' + spriteIndex);
+                    brick.visible = true;
+                    brick.x = 200;
+                    brick.y = posY;
+                    brick.z = tempScore;
+                }
+                else {
+                    brick.visible = false;
+                }
             }
         }
-        // removeBricks(cost);
         generator.count += count;
         updateGenerators();
     }
 
     function updateScoreUI() {
-        var flooredScore = Math.floor(score);
+        let flooredScore = Math.floor(score);
         $('#score').text(new Intl.NumberFormat().format(Math.max(0, flooredScore)));
         $('#height').text('Height: ' + new Intl.NumberFormat().format(Math.floor(flooredScore / 16) * 0.2) + 'm');
     }
@@ -249,8 +251,8 @@ window.onload = function() {
     }
 
     function updateMilestones() {
-        var flooredScore = Math.floor(score);
-        var lastMilestone = currentMilestoneId;
+        let flooredScore = Math.floor(score);
+        let lastMilestone = currentMilestoneId;
         milestones.forEach((milestone, index) => {
             if (Math.floor(flooredScore / 16) * 0.2 >= milestone.height && index > currentMilestoneId) {
                 currentMilestoneId = index;

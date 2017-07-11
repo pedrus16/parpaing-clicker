@@ -31,7 +31,6 @@ ul {
 	position: relative;
 	width: 300px;
 	max-height: 768px;
-    padding: 10px;
     flex: 1;
 }
 
@@ -100,6 +99,7 @@ ul {
 .generator-list {
     max-height: 100%;
     overflow: auto;
+    padding: 0 10px;
 }
 
 .generator-list  > ul > li {
