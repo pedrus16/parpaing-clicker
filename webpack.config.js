@@ -18,7 +18,7 @@ module.exports = {
       'babel-polyfill',
       path.resolve(__dirname, 'src/main.js')
     ],
-    vendor: ['pixi', 'p2', 'phaser', 'webfontloader']
+    vendor: ['pixi', 'p2', 'phaser', 'webfontloader', 'jquery']
   },
   devtool: 'cheap-source-map',
   output: {
@@ -39,8 +39,8 @@ module.exports = {
       }
     }),
     new webpack.ProvidePlugin({
-        $: "jquery",
-        jQuery: "jquery"
+        $: 'jquery',
+        jQuery: 'jquery'
     })
   ],
   module: {
