@@ -1,110 +1,118 @@
-<!doctype html>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="src/styles.css">
-        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-    </head>
-    <body>
-    	<div class="container">
-		    <div class="sidebar">
-		    	<div class="cinder-block" id="bt-cinderblock">
-		    		<div class="wobble">
-		    			<div class="sine">
-			    			<img src="assets/parpaing_big.png">
-		    			</div>
-		    		</div>
-	    		</div>
-    			<div class="generator-list">
-	    			<ul>
+<!DOCTYPE html>
+<html lang="en">
 
-		    			<li class="generator" id="bt-generator1">
-		    				<button type="button">
-	    						<img src="assets/engineer.png">
-		    					<div class="label">
-				    				<div>Pedro</div>
-				    				x <span class="generator-count"></span>
-		    					</div>
-			    				<div class="">
-			    					<span class="generator-cost"></span> <span class="inline-cinder-block"></span>
-		    					</div>
-	    					</button>
-						</li>
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser - ES6 - Webpack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta http-equiv="cleartype" content="on">
+    <link rel="stylesheet" href="assets/styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+</head>
 
-						<li class="generator" id="bt-generator2">
-		    				<button type="button">
-			    				<img src="assets/robot-arm.png">
-		    					<div class="label">
-				    				<div>Robot arm</div>
-				    				x <span class="generator-count"></span>
-		    					</div>
-			    				<div class="">
-			    					<span class="generator-cost"></span> <span class="inline-cinder-block"></span>
-		    					</div>
-	    					</button>
-						</li>
+<body>
 
-						<li class="generator" id="bt-generator3">
-		    				<button type="button">
-		    					<img src="assets/crane.png">
-		    					<div class="label">
-				    				<div>Crane</div>
-				    				x <span class="generator-count"></span>
-		    					</div>
-			    				<div class="">
-			    					<span class="generator-cost"></span> <span class="inline-cinder-block"></span>
-		    					</div>
-	    					</button>
-						</li>
+    <div class="container">
+        <div class="sidebar">
+            <div class="cinder-block" id="bt-cinderblock">
+                <div class="wobble">
+                    <div class="sine">
+                        <img src="assets/images/parpaing_big.png">
+                    </div>
+                </div>
+            </div>
+            <div class="generator-list">
+                <ul>
 
-						<li class="generator" id="bt-generator4">
-		    				<button type="button">
-			    				<img src="assets/drone.png">
-		    					<div class="label">
-				    				<div>Drone</div>
-				    				x <span class="generator-count"></span>
-		    					</div>
-			    				<div class="">
-			    					<span class="generator-cost"></span> <span class="inline-cinder-block"></span>
-		    					</div>
-	    					</button>
-						</li>
+                    <li class="generator" id="bt-generator1">
+                        <button type="button">
+                            <img src="assets/images/engineer.png">
+                            <div class="label">
+                                <div>Pedro</div>
+                                x <span class="generator-count"></span>
+                            </div>
+                            <div class="">
+                                <span class="generator-cost"></span> <span class="inline-cinder-block"></span>
+                            </div>
+                        </button>
+                    </li>
 
-						<li class="generator" id="bt-generator5">
-		    				<button type="button">
-		    					<img src="assets/3d-printer.png">
-		    					<div class="label">
-				    				<div>3D Printer</div>
-				    				x <span class="generator-count"></span>
-		    					</div>
-			    				<div class="">
-			    					<span class="generator-cost"></span> <span class="inline-cinder-block"></span>
-		    					</div>
-	    					</button>
-						</li>
+                    <li class="generator" id="bt-generator2">
+                        <button type="button">
+                            <img src="assets/images/robot-arm.png">
+                            <div class="label">
+                                <div>Robot arm</div>
+                                x <span class="generator-count"></span>
+                            </div>
+                            <div class="">
+                                <span class="generator-cost"></span> <span class="inline-cinder-block"></span>
+                            </div>
+                        </button>
+                    </li>
 
-	    			</ul>
-    			</div>
-		    </div>
+                    <li class="generator" id="bt-generator3">
+                        <button type="button">
+                            <img src="assets/images/crane.png">
+                            <div class="label">
+                                <div>Crane</div>
+                                x <span class="generator-count"></span>
+                            </div>
+                            <div class="">
+                                <span class="generator-cost"></span> <span class="inline-cinder-block"></span>
+                            </div>
+                        </button>
+                    </li>
 
-		    <div class="viewport-container">
-		    	<div id="viewport"></div>
-		    	<div class="score">
-		    		<h3><span id="score"></span> <span class="inline-cinder-block"></h3>
-		    		<h3><span id="bps"></span> <span class="inline-cinder-block"></span>/s</h3>
-		    		<h3 id="height"></h3>
-		    	</div>
-	    	</div>
+                    <li class="generator" id="bt-generator4">
+                        <button type="button">
+                            <img src="assets/images/drone.png">
+                            <div class="label">
+                                <div>Drone</div>
+                                x <span class="generator-count"></span>
+                            </div>
+                            <div class="">
+                                <span class="generator-cost"></span> <span class="inline-cinder-block"></span>
+                            </div>
+                        </button>
+                    </li>
 
-	    	<div class="milestone">
-	    		<h2>~ Milestones ~</h2>
-	    		<ul id="milestone-list">
-	    		</ul>
-	    	</div>
+                    <li class="generator" id="bt-generator5">
+                        <button type="button">
+                            <img src="assets/images/3d-printer.png">
+                            <div class="label">
+                                <div>3D Printer</div>
+                                x <span class="generator-count"></span>
+                            </div>
+                            <div class="">
+                                <span class="generator-cost"></span> <span class="inline-cinder-block"></span>
+                            </div>
+                        </button>
+                    </li>
 
-	    </div>
-	    <script type="text/javascript" src="lib/jquery-3.2.1.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="lib/phaser.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="src/main.js" charset="utf-8"></script>
-    </body>
+                </ul>
+            </div>
+        </div>
+
+        <div class="viewport-container">
+            <div id="viewport"></div>
+            <div class="score">
+                <h3><span id="score"></span> <span class="inline-cinder-block"></h3>
+                <h3><span id="bps"></span> <span class="inline-cinder-block"></span>/s</h3>
+                <h3 id="height"></h3>
+            </div>
+        </div>
+
+        <div class="milestone">
+            <h2>~ Milestones ~</h2>
+            <ul id="milestone-list">
+            </ul>
+        </div>
+    </div>
+    <script src="dist/vendor.bundle.js"></script>
+    <script src="dist/bundle.js"></script>
+
+</body>
+
 </html>
