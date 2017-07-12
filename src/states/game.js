@@ -36,6 +36,8 @@ export default class extends Phaser.State {
     this.game.stage.disableVisibilityChange = true;
     this.game.input.mouse.capture = true;
     this.game.stage.backgroundColor = '#7DC5FF';
+    this.storage = localStorage;
+
   }
 
   preload () {
@@ -83,7 +85,7 @@ export default class extends Phaser.State {
     this.cameraHeight.anchor.setTo(0.5);
     this.game.camera.x = this.game.world.centerX - 512;
     this.game.camera.y = this.game.world.height - 384;
-    this.game.camera.follow(this.cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.9);
+    this.game.camera.follow(this.cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 1);
     this.game.camera.bounds = null;
 
     this.ground = game.add.sprite(200, game.world.height - 350, 'ground');
@@ -107,6 +109,9 @@ export default class extends Phaser.State {
     this.bricks.x = 200;
     this.bricks.y = this.game.world.height - 384;
     this.bricks.forEach((brick) => brick.anchor.setTo(0.5, 0.5));
+
+    this.loadState();
+    setInterval(() => this.saveState(), 5000);
 
   }
 
@@ -180,7 +185,7 @@ export default class extends Phaser.State {
 
   addBricks(step = 1) {
 
-    for (let i = 0; i < step; i++) {
+    for (let i = Math.max(0, step - this.bricks.children.length); i < step; i++) {
       let tempScore = this.scoreInteger() + i;
       let posY = -this.rowHeight * Math.floor(tempScore / 32);
       let brick = this.bricks.getBottom();
@@ -223,6 +228,7 @@ export default class extends Phaser.State {
     }
     generator.count += count;
     this.updateGenerators();
+    this.saveState();
 
   }
 
@@ -261,6 +267,27 @@ export default class extends Phaser.State {
       $('#milestone-list').append('<li>' + this.milestones[this.currentMilestoneId].name + ' (' + this.milestones[this.currentMilestoneId].height + 'm)' + '</li>');
     }
 
+  }
+
+  saveState() {
+    let generators = this.generators.map((generator) => generator.count);
+    this.storage.setItem('save', JSON.stringify({
+      score: this.score,
+      generators: generators
+    }));
+  }
+
+  loadState() {
+    let state = JSON.parse(this.storage.getItem('save'));
+    if (state['generators'] && Array.isArray(state['generators'])) {
+      state['generators'].forEach((count, index) => {
+        if (this.generators[index]) {
+          this.generators[index].count = count;
+        }
+      });
+    }
+    this.updateBricks(0, state['score']);
+    this.score = state['score'] || 0;
   }
 
 }
