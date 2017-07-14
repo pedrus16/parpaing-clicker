@@ -99,33 +99,41 @@ ul {
 .generator-list {
     max-height: 100%;
     overflow: auto;
-    padding: 0 10px;
+    /*padding: 0 10px;*/
 }
 
-.generator-list  > ul > li {
-	margin-bottom: 10px;
+.generator {
+    border-bottom: 1px solid #444;
+}
+
+.generator-list > ul > li:first-child {
+	/*border-width: 1px 0 1px 0;*/
+	border-top: 1px solid #444;
 }
 
 .generator > button {
-    background: none;
+    /*background: url('../images/solid.png');*/
+    color: #CCC;
     border: none;
-    border-radius: 4px;
+    background: none;
+    border-radius: 0px;
     width: 100%;
     text-align: left;
     cursor: pointer;
     margin: 0;
-	padding: 16px;
+	padding: 8px;
 	display: flex;
     flex-direction: row;
     align-items: center;
-    background: #CCC;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	/*box-shadow: 0px 4px 8px rgba(0,0,0,0.8) inset;*/
 }
+
 
 .generator > button.disable {
 	opacity: 0.4;
@@ -163,11 +171,24 @@ ul {
     text-transform: uppercase;
 }
 
+.milestone > ul {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 5px;
+	align-items: center;
+}
+
 .milestone > ul > li {
-    padding: 10px;
     /* border: 2px solid orange; */
-    margin: 10px;
+    opacity: 0.4;
+    margin: 5px;
     border-radius: 4px;
     background: rgba(255, 187, 54, 0.4);
     color: #CCC;
+    max-width: 64px;
+    padding: 10px;
+}
+
+.milestone > ul > li.unlocked {
+	opacity: 1;
 }

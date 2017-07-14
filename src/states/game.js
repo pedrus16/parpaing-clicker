@@ -11,27 +11,28 @@ export default class extends Phaser.State {
     this.rowHeight = 70;
     this.generators = [
         { selector: '#bt-generator1', bps: 1, count: 0, cost: 10, growthRate: 1.07, multiplier: 1 },
-        { selector: '#bt-generator2', bps: 5, count: 0, cost: 80, growthRate: 1.0, multiplier: 1 },
+        { selector: '#bt-generator2', bps: 5, count: 0, cost: 80, growthRate: 1.07, multiplier: 1 },
         { selector: '#bt-generator3', bps: 20, count: 0, cost: 200, growthRate: 1.07, multiplier: 1 },
         { selector: '#bt-generator4', bps: 80, count: 0, cost: 1000, growthRate: 1.07, multiplier: 1 },
         { selector: '#bt-generator5', bps: 150, count: 0, cost: 2000, growthRate: 1.07, multiplier: 1 },
-    ]
+    ];
+    const milestoneElem = $('#milestone-list > li');
     this.milestones = [
-        { height: 2.6, name: 'Little house' },
-        { height: 4.8, name: 'Giraffe' },
-        { height: 150, name: 'Godzilla' },
-        { height: 324, name: 'Eiffel Tower hon hon hon' },
-        { height: 828, name: 'Burj Khalifa' },
-        { height: 8848, name: 'Everest' },
-        { height: 15000, name: 'Above the clouds' },
-        { height: 690000, name: 'Spaaaaaace' },
-        { height: 384400000, name: 'Moon' },
+        { height: 2.6, name: 'Little house', element: milestoneElem.get(0) },
+        { height: 4.8, name: 'Giraffe', element: milestoneElem.get(1) },
+        { height: 150, name: 'Godzilla', element: milestoneElem.get(2) },
+        { height: 324, name: 'Eiffel Tower hon hon hon', element: milestoneElem.get(3) },
+        { height: 828, name: 'Burj Khalifa', element: milestoneElem.get(4) },
+        { height: 8848, name: 'Everest', element: milestoneElem.get(5) },
+        { height: 15000, name: 'Above the clouds', element: milestoneElem.get(6) },
+        { height: 690000, name: 'Spaaaaaace', element: milestoneElem.get(7) },
+        { height: 384400000, name: 'Moon', element: milestoneElem.get(8) },
     ];
     this.heightColors = [
         { height: 0, color: '#7DC5FF' },
         { height: 12000, color: '#7DC5FF' },
         { height: 80000, color: '#001122' },
-    ]
+    ];
     this.currentMilestoneId = -1;
     this.game.stage.disableVisibilityChange = true;
     this.game.input.mouse.capture = true;
@@ -76,6 +77,7 @@ export default class extends Phaser.State {
     this.load.image('parpin32', 'assets/images/0032.png');
     this.load.image('parpaingButton', 'assets/images/parpaing_button.png');
     this.load.image('ground', 'assets/images/ground.png');
+    this.load.image('background', 'assets/images/witewall_3.png');
 
   }
 
@@ -85,12 +87,16 @@ export default class extends Phaser.State {
     this.cameraHeight.anchor.setTo(0.5);
     this.game.camera.x = this.game.world.centerX - 512;
     this.game.camera.y = this.game.world.height - 384;
-    this.game.camera.follow(this.cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 0.5, 1);
     this.game.camera.bounds = null;
+    this.game.renderer.renderSession.roundPixels = true
+
+    // this.background = game.add.tileSprite(0, 0, 400, 768, 'background');
+    // this.background.fixedToCamera = true;
 
     this.ground = game.add.sprite(200, game.world.height - 350, 'ground');
     this.ground.scale.set(0.5);
     this.ground.anchor.set(0.5, 0.5);
+
 
     this.bricks = game.add.group();
     this.bps = 0;
@@ -104,7 +110,7 @@ export default class extends Phaser.State {
 
     this.updateGenerators();
 
-    this.bricks.createMultiple(400, 'parpin1', 0, 0);
+    this.bricks.createMultiple(600, 'parpin1', 0, 0);
     this.bricks.scale.setTo(this.scale);
     this.bricks.x = 200;
     this.bricks.y = this.game.world.height - 384;
@@ -130,7 +136,10 @@ export default class extends Phaser.State {
     this.bps = Math.round(increment / (this.game.time.elapsed / 1000))
 
     $('#bps').text(this.bps);
+    let camSpeed = this.bps < 800 ? 0.4 : 1;
+    this.game.camera.follow(this.cameraHeight, Phaser.Camera.FOLLOW_LOCKON, 1, camSpeed);
     this.cameraHeight.y = this.game.world.centerY - this.rowHeight * this.scale * 0.5 * Math.floor(this.scoreInteger() / 16);
+    // this.background.tilePosition.y = -this.cameraHeight.y;
 
   }
 
@@ -194,6 +203,12 @@ export default class extends Phaser.State {
         brick.loadTexture('parpin' + spriteIndex);
         brick.x = 0;
         brick.y = posY;
+        brick.alpha = 1;
+        if (this.bps < 50) {
+          console.log(this.bps);
+          game.add.tween(brick).from({ alpha: 0 }, 200, Phaser.Easing.In, true);
+          game.add.tween(brick).from({ y: '-200px' }, 500, Phaser.Easing.Bounce.Out, true);
+        }
         brick.visible = true;
         this.bricks.bringToTop(brick);
       }
@@ -208,7 +223,7 @@ export default class extends Phaser.State {
     let cost = Math.floor(generator.cost * Math.pow(generator.growthRate, generator.count));
     if (cost > this.score) { return; }
     this.score -= cost;
-    for (let i = 0; i < cost; i++) {
+    for (let i = Math.max(0, cost - this.bricks.children.length); i < cost; i++) {
       let tempScore = this.scoreInteger() + cost - i - this.bricks.children.length - 1;
       let brick = this.bricks.getTop();
       if (brick) {
@@ -261,11 +276,12 @@ export default class extends Phaser.State {
     this.milestones.forEach((milestone, index) => {
       if (Math.floor(this.scoreInteger() / 16) * 0.2 >= milestone.height && index > this.currentMilestoneId) {
         this.currentMilestoneId = index;
+        $(milestone.element).addClass('unlocked');
       }
     });
-    if (this.currentMilestoneId > lastMilestone) {
-      $('#milestone-list').append('<li>' + this.milestones[this.currentMilestoneId].name + ' (' + this.milestones[this.currentMilestoneId].height + 'm)' + '</li>');
-    }
+    // if (this.currentMilestoneId > lastMilestone) {
+      
+    // }
 
   }
 
@@ -279,6 +295,7 @@ export default class extends Phaser.State {
 
   loadState() {
     let state = JSON.parse(this.storage.getItem('save'));
+    if (!state) { return; }
     if (state['generators'] && Array.isArray(state['generators'])) {
       state['generators'].forEach((count, index) => {
         if (this.generators[index]) {
